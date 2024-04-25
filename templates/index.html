@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Randomizer</title>
+</head>
+<body>
+
+    <h1 class="title">RandomizerPlus</h1>
+    
+    <h2>Enter Names:</h2>
+    <textarea id="namesTextarea" placeholder="Enter names separated by commas"></textarea>
+    
+    <h2>Enter Roles:</h2>
+    <textarea id="rolesTextarea" placeholder="Enter roles separated by commas"></textarea>
+    
+    <h2>Number of Groups:</h2>
+    <input type="number" id="numGroupsInput" min="1" value="1">
+    
+    <button onclick="divideNames()">Divide Names and Roles</button>
+    
+    <div id="groupsOutput" style="display: none;">
+        <h2>Groups:</h2>
+        <div id="groupsContainer"></div>
+    </div>
+
+    <script src="../static/script.js"></script>
+</body>
+</html>
