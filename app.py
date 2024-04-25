@@ -7,7 +7,7 @@ from firebase_admin import db
 app = Flask(__name__)
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("Creds_python.json")
+cred = credentials.Certificate("../../Creds_python.json")
 
 database_url = {
     'databaseURL': 'https://randomizer-3a096-default-rtdb.europe-west1.firebasedatabase.app'
