@@ -1,0 +1,8 @@
+# Ignore Firebase credentials file
+Creds_python.json
+
+# Ignore any compiled Python files
+*.pyc
+
+# Ignore any generated JavaScript files
+*.js
