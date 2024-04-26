@@ -1,13 +1,21 @@
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, firestore
 from firebase_admin import db
+import hashlib
+from models import db, User
+
+
+
+
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'
+db.init_app(app)
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("../../Creds_python.json")
+cred = credentials.Certificate("Creds_python.json")
 
 database_url = {
     'databaseURL': 'https://randomizer-3a096-default-rtdb.europe-west1.firebasedatabase.app'
@@ -15,7 +23,7 @@ database_url = {
 
 firebase_admin.initialize_app(cred, database_url)
 
-ref = db.reference('/')
+db =  firestore.client()
 
 
 
@@ -25,18 +33,56 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
-    # Get registration data from the request
-    registration_data = request.json
-    print(registration_data)
+    name = request.form['name']
+    surname = request.form['Surname']
+    password = request.form['password']
 
-    # Make a POST request to send the registration data to Firebase
-    response = requests.post(database_url + 'registrations.json', json=registration_data)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-    # Check if the request was successful
-    if response.ok:
-        return 'Registration successful'
+    # Save user data to Firebase Firestore (replace this with your own logic)
+    user_data = {
+        'name': name,
+        'surname': surname,
+        'password': hashed_password
+    }
+    db.collection('users').add(user_data)
+
+    # Redirect the user to the login page after registration
+    return render_template('login_register.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    # Query user data from Firebase Firestore
+    users_ref = db.collection('users')
+    query = users_ref.where('name', '==', username).limit(1)
+    user_data = query.get()
+
+    print("User data:", user_data)  # Print user data for debugging
+
+    if user_data:
+        # Get the first user document
+        user_doc = user_data[0].to_dict()
+
+        print("User document:", user_doc)  # Print user document for debugging
+
+        # Check if the provided password matches the hashed password stored in the database
+        if hashlib.sha256(password.encode()).hexdigest() == user_doc['password']:
+            # Passwords match, redirect to index.html
+            print("Login successful!")  # Print success message for debugging
+            return render_template('index.html')
+        else:
+            # Passwords don't match, show error message
+            error_message = "Incorrect password. Please try again."
+            print("Incorrect password.")  # Print error message for debugging
+            return render_template('login_register.html', error_message=error_message)
     else:
-        return 'Failed to register: ' + response.text, 500
+        # User not found, show error message
+        error_message = "User not found. Please register first."
+        print("User not found.")  # Print error message for debugging
+        return render_template('login_register.html', error_message=error_message)
 
 if __name__ == '__main__':
     app.run(debug=True)
