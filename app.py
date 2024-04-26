@@ -6,15 +6,10 @@ import hashlib
 from models import db, User
 
 
-
-
-
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///your_database.db'
 db.init_app(app)
 
-# Initialize Firebase Admin SDK
 cred = credentials.Certificate("Creds_python.json")
 
 database_url = {
@@ -39,7 +34,6 @@ def register():
 
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-    # Save user data to Firebase Firestore (replace this with your own logic)
     user_data = {
         'name': name,
         'surname': surname,
@@ -47,7 +41,6 @@ def register():
     }
     db.collection('users').add(user_data)
 
-    # Redirect the user to the login page after registration
     return render_template('login_register.html')
 
 @app.route('/login', methods=['POST'])
@@ -55,31 +48,25 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    # Query user data from Firebase Firestore
     users_ref = db.collection('users')
     query = users_ref.where('name', '==', username).limit(1)
     user_data = query.get()
 
-    print("User data:", user_data)  # Print user data for debugging
+    print("User data:", user_data) 
 
     if user_data:
-        # Get the first user document
         user_doc = user_data[0].to_dict()
 
-        print("User document:", user_doc)  # Print user document for debugging
+        print("User document:", user_doc)  
 
-        # Check if the provided password matches the hashed password stored in the database
         if hashlib.sha256(password.encode()).hexdigest() == user_doc['password']:
-            # Passwords match, redirect to index.html
             print("Login successful!")  # Print success message for debugging
             return render_template('index.html')
         else:
-            # Passwords don't match, show error message
             error_message = "Incorrect password. Please try again."
             print("Incorrect password.")  # Print error message for debugging
             return render_template('login_register.html', error_message=error_message)
     else:
-        # User not found, show error message
         error_message = "User not found. Please register first."
         print("User not found.")  # Print error message for debugging
         return render_template('login_register.html', error_message=error_message)

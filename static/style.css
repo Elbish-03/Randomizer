@@ -88,12 +88,10 @@ ul li {
     border: 1px solid #ccc;
     padding: 5px;
 }
-/* Centering the title */
 .title {
     text-align: center;
 }
 
-/* Adding animation to the title */
 @keyframes fadeIn {
     0% {
         opacity: 0;
